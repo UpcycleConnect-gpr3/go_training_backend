@@ -3,45 +3,42 @@ package image_handlers
 import (
 	"encoding/json"
 	"go-training-backend/app/actions/image_actions"
-	"go-training-backend/app/middleware/auth_middleware"
 	"go-training-backend/app/models/image_models"
+	"go-training-backend/utils/auth"
 	"go-training-backend/utils/log"
+	"go-training-backend/utils/request"
 	"go-training-backend/utils/response"
 	"net/http"
-	"strconv"
 )
-
-func parsePage(r *http.Request) (int, int) {
-	page, err := strconv.Atoi(r.URL.Query().Get("page"))
-	if err != nil || page < 1 {
-		page = 1
-	}
-	limit, err := strconv.Atoi(r.URL.Query().Get("limit"))
-	if err != nil || limit < 1 {
-		limit = 20
-	}
-	return page, limit
-}
 
 func GetImagesHandler(w http.ResponseWriter, r *http.Request) {
 	log.Api(r)
 
-	page, limit := parsePage(r)
-	images := image_models.GetAllImages(page, limit)
+	var image image_models.Image
+	var images []image_models.Image
+
+	columns := []string{"id", "path", "description", "created_by_user_id", "created_at", "updated_at"}
+
+	err := image.All(columns, &images)
+	if err != nil {
+		response.NewErrorMessage(w, response.ErrInvalidValue, http.StatusInternalServerError)
+		return
+	}
 	response.NewSuccessData(w, images)
 }
 
 func GetImageHandler(w http.ResponseWriter, r *http.Request) {
 	log.Api(r)
 
-	id, err := strconv.Atoi(r.PathValue("id"))
-	if err != nil {
-		response.NewErrorMessage(w, "Invalid id", http.StatusBadRequest)
+	id := request.Request(r, "id").ConvertToInt(w)
+	if id == -1 {
 		return
 	}
 
-	image := image_models.GetImageByID(id)
-	if image == nil {
+	var image image_models.Image
+	columns := []string{"id", "path", "description", "created_by_user_id", "created_at", "updated_at"}
+	err := image.Get(columns, "id = ?", id)
+	if err != nil {
 		response.NewErrorMessage(w, response.ErrImageNotFound, http.StatusNotFound)
 		return
 	}
@@ -52,7 +49,7 @@ func GetImageHandler(w http.ResponseWriter, r *http.Request) {
 func CreateImageHandler(w http.ResponseWriter, r *http.Request) {
 	log.Api(r)
 
-	userID := auth_middleware.GetUserId(r.Context())
+	userID := auth.Auth(r).Id()
 
 	var dto image_actions.CreateImageDTO
 	if err := json.NewDecoder(r.Body).Decode(&dto); err != nil {
@@ -72,13 +69,15 @@ func CreateImageHandler(w http.ResponseWriter, r *http.Request) {
 func UpdateImageHandler(w http.ResponseWriter, r *http.Request) {
 	log.Api(r)
 
-	id, err := strconv.Atoi(r.PathValue("id"))
-	if err != nil {
-		response.NewErrorMessage(w, "Invalid id", http.StatusBadRequest)
+	id := request.Request(r, "id").ConvertToInt(w)
+	if id == -1 {
 		return
 	}
 
-	if image_models.GetImageByID(id) == nil {
+	var image image_models.Image
+	columns := []string{"id"}
+	err := image.Get(columns, "id = ?", id)
+	if err != nil {
 		response.NewErrorMessage(w, response.ErrImageNotFound, http.StatusNotFound)
 		return
 	}
@@ -89,25 +88,27 @@ func UpdateImageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	validationErrors, image := image_actions.UpdateImage(id, dto)
+	validationErrors, updatedImage := image_actions.UpdateImage(id, dto)
 	if len(validationErrors) > 0 {
 		response.NewValidationError(w, response.ErrInvalidBody, validationErrors)
 		return
 	}
 
-	response.NewSuccessData(w, image)
+	response.NewSuccessData(w, updatedImage)
 }
 
 func DeleteImageHandler(w http.ResponseWriter, r *http.Request) {
 	log.Api(r)
 
-	id, err := strconv.Atoi(r.PathValue("id"))
-	if err != nil {
-		response.NewErrorMessage(w, "Invalid id", http.StatusBadRequest)
+	id := request.Request(r, "id").ConvertToInt(w)
+	if id == -1 {
 		return
 	}
 
-	if image_models.GetImageByID(id) == nil {
+	var image image_models.Image
+	columns := []string{"id"}
+	err := image.Get(columns, "id = ?", id)
+	if err != nil {
 		response.NewErrorMessage(w, response.ErrImageNotFound, http.StatusNotFound)
 		return
 	}

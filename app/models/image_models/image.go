@@ -1,9 +1,9 @@
 package image_models
 
 import (
-	"database/sql"
 	"fmt"
 	"go-training-backend/database"
+	"go-training-backend/utils/db"
 	"go-training-backend/utils/log"
 	"time"
 )
@@ -19,6 +19,14 @@ type Image struct {
 	UpdatedAt       time.Time `db:"updated_at" json:"updated_at"`
 }
 
+func (img *Image) Get(columns []string, by string, value any) error {
+	return db.GetQuery[Image](database.Training, TABLE, columns, by, value, img)
+}
+
+func (img *Image) All(columns []string, dest *[]Image) error {
+	return db.AllQuery[Image](database.Training, TABLE, columns, dest)
+}
+
 type CreateImageDTO struct {
 	Path            string
 	Description     string
@@ -28,51 +36,6 @@ type CreateImageDTO struct {
 type UpdateImageDTO struct {
 	Path        string
 	Description string
-}
-
-func GetAllImages(page, limit int) []Image {
-	action := "SELECT " + TABLE + " (paginated)"
-	offset := (page - 1) * limit
-
-	rows, err := database.Training.Query(
-		"SELECT id, path, description, created_by_user_id, created_at, updated_at FROM "+TABLE+" LIMIT ? OFFSET ?",
-		limit, offset,
-	)
-	if err != nil {
-		log.Database(action, err)
-		return []Image{}
-	}
-	defer rows.Close()
-
-	images := []Image{}
-	for rows.Next() {
-		var img Image
-		if err := rows.Scan(&img.Id, &img.Path, &img.Description, &img.CreatedByUserID, &img.CreatedAt, &img.UpdatedAt); err != nil {
-			log.Database(action, err)
-			continue
-		}
-		images = append(images, img)
-	}
-	return images
-}
-
-func GetImageByID(id int) *Image {
-	action := fmt.Sprintf("SELECT "+TABLE+" WHERE id : %d", id)
-	img := Image{}
-
-	row := database.Training.QueryRow(
-		"SELECT id, path, description, created_by_user_id, created_at, updated_at FROM "+TABLE+" WHERE id = ?",
-		id,
-	)
-	err := row.Scan(&img.Id, &img.Path, &img.Description, &img.CreatedByUserID, &img.CreatedAt, &img.UpdatedAt)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil
-		}
-		log.Database(action, err)
-		return nil
-	}
-	return &img
 }
 
 func CreateImage(dto CreateImageDTO) *Image {
@@ -91,7 +54,7 @@ func CreateImage(dto CreateImageDTO) *Image {
 		log.Database(action, err)
 		return nil
 	}
-	return GetImageByID(int(id))
+	return &Image{Id: int(id)}
 }
 
 func UpdateImage(id int, dto UpdateImageDTO) *Image {
@@ -105,7 +68,7 @@ func UpdateImage(id int, dto UpdateImageDTO) *Image {
 		log.Database(action, err)
 		return nil
 	}
-	return GetImageByID(id)
+	return &Image{Id: id}
 }
 
 func DeleteImage(id int) {

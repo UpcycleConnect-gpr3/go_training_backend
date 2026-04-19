@@ -63,7 +63,7 @@ func CreateImageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.NewSuccessData(w, image)
+	response.NewSuccessData(w, map[string]int{"image_id": image.Id})
 }
 
 func UpdateImageHandler(w http.ResponseWriter, r *http.Request) {
@@ -94,7 +94,7 @@ func UpdateImageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.NewSuccessData(w, updatedImage)
+	response.NewSuccessData(w, map[string]int{"image_id": updatedImage.Id})
 }
 
 func DeleteImageHandler(w http.ResponseWriter, r *http.Request) {

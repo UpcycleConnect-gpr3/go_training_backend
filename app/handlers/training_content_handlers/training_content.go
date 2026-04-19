@@ -60,7 +60,7 @@ func CreateTrainingContentHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.NewSuccessData(w, content)
+	response.NewSuccessData(w, map[string]int{"training_content_id": content.Id})
 }
 
 func UpdateTrainingContentHandler(w http.ResponseWriter, r *http.Request) {
@@ -91,7 +91,7 @@ func UpdateTrainingContentHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.NewSuccessData(w, updatedContent)
+	response.NewSuccessData(w, map[string]int{"training_content_id": updatedContent.Id})
 }
 
 func DeleteTrainingContentHandler(w http.ResponseWriter, r *http.Request) {

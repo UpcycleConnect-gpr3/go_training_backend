@@ -47,11 +47,13 @@ func CreateCategory(dto CreateCategoryDTO) *Category {
 		"INSERT INTO "+TABLE+" (name, slug, description, created_by_user_id) VALUES (?, ?, ?, ?)",
 		dto.Name, dto.Slug, dto.Description, dto.CreatedByUserID,
 	)
+
 	if err != nil {
 		log.Database(action, err)
 		return nil
 	}
 	id, err := result.LastInsertId()
+
 	if err != nil {
 		log.Database(action, err)
 		return nil

@@ -2,8 +2,8 @@ package cmd
 
 import (
 	"fmt"
-	"go-upcycle_connect-backend/cmd/database"
-	"go-upcycle_connect-backend/cmd/server"
+	"go-training-backend/cmd/database"
+	"go-training-backend/cmd/server"
 	"os"
 )
 

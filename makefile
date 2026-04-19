@@ -1,5 +1,5 @@
 MAIN_FILE	=main.go
-BINARY_NAME =go_upcycle_connect_backend
+BINARY_NAME =go_training_backend
 BUILD_DIR	=build
 
 serve:

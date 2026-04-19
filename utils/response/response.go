@@ -2,7 +2,7 @@ package response
 
 import (
 	"encoding/json"
-	"go-upcycle_connect-backend/utils/rules"
+	"go-training-backend/utils/rules"
 	"net/http"
 )
 
@@ -70,6 +70,7 @@ var httpStatusTexts = map[int]string{
 }
 
 const (
+	ErrInvalidValue         = "Invalid Value"
 	ErrAuthFailed           = "Credentials do not match"
 	ErrInvalidBody          = "Incorrect body format"
 	ErrJson                 = "Json parse error"
@@ -83,6 +84,12 @@ const (
 	ErrInvalidAuthToken     = "Invalid authorization token"
 	ErrInvalidOrExpiredHash = "Invalid or expired hash"
 	ErrFetchingTOTPRecord   = "Failed to fetch TOTP record"
+	ErrCategoryNotFound     = "Category not found"
+	ErrScheduleNotFound     = "Schedule not found"
+	ErrCurriculaNotFound     = "Curricula not found"
+	ErrImageNotFound         = "Image not found"
+	ErrTrainingNotFound      = "Training not found"
+	ErrTrainingContentNotFound = "Training content not found"
 )
 
 const (

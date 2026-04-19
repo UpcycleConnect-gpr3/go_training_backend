@@ -2,8 +2,8 @@ package auth_middleware
 
 import (
 	"context"
-	"go-upcycle_connect-backend/utils/jwt"
-	"go-upcycle_connect-backend/utils/log"
+	"go-training-backend/utils/jwt"
+	"go-training-backend/utils/log"
 	"net/http"
 )
 
@@ -14,6 +14,10 @@ const userIdKey contextKey = "userId"
 func IsAuth(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		userId := jwt.Auth(w, r)
+
+		if userId == "" {
+			return
+		}
 
 		ctx := context.WithValue(r.Context(), userIdKey, userId)
 		r = r.WithContext(ctx)

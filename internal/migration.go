@@ -1,16 +1,17 @@
 package internal
 
 import (
-	"database/sql"
 	"fmt"
-	"go-upcycle_connect-backend/utils/log"
+	"go-training-backend/utils/log"
 	"os"
 	"strings"
+
+	"github.com/jmoiron/sqlx"
 )
 
 const MigrationsPath = "database/migrations/"
 
-func Migrate(db *sql.DB) {
+func Migrate(db *sqlx.DB) {
 	migrations, errorToGetNotExistingMigrations := getNotExistingMigrations(db)
 	if errorToGetNotExistingMigrations != nil {
 		log.Fatal(errorToGetNotExistingMigrations)
@@ -42,7 +43,7 @@ func Migrate(db *sql.DB) {
 	}
 }
 
-func CreateTableMigrations(db *sql.DB) {
+func CreateTableMigrations(db *sqlx.DB) {
 	systemTable, errorToLoadMigrationFile := readMigrationFile("system/migration_table.sql")
 
 	if errorToLoadMigrationFile != nil {
@@ -97,7 +98,7 @@ func getMigrationFiles() ([]string, error) {
 	return fileNames, nil
 }
 
-func getExistingMigrations(db *sql.DB) ([]string, error) {
+func getExistingMigrations(db *sqlx.DB) ([]string, error) {
 	fileNames, errorToGetMigration := getMigrationFiles()
 
 	if errorToGetMigration != nil {
@@ -128,7 +129,7 @@ func getExistingMigrations(db *sql.DB) ([]string, error) {
 	return existingMigrations, nil
 }
 
-func getMigrationBatch(db *sql.DB) ([]int, error) {
+func getMigrationBatch(db *sqlx.DB) ([]int, error) {
 
 	var batches []int
 
@@ -152,7 +153,7 @@ func getMigrationBatch(db *sql.DB) ([]int, error) {
 	return batches, nil
 }
 
-func getNotExistingMigrations(db *sql.DB) ([]string, error) {
+func getNotExistingMigrations(db *sqlx.DB) ([]string, error) {
 	fileNames, errorToGetMigration := getMigrationFiles()
 
 	if errorToGetMigration != nil {
@@ -182,7 +183,7 @@ func getNotExistingMigrations(db *sql.DB) ([]string, error) {
 	return notExistingMigrations, nil
 }
 
-func executeMigration(db *sql.DB, migrations []string) {
+func executeMigration(db *sqlx.DB, migrations []string) {
 	batches, errorToGetBatch := getMigrationBatch(db)
 
 	var batch int

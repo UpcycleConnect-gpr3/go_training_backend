@@ -1,7 +1,7 @@
 package ratelimit_middleware
 
 import (
-	"go-upcycle_connect-backend/utils/response"
+	"go-training-backend/utils/response"
 	"net/http"
 	"sync"
 	"time"

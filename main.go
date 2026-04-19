@@ -1,7 +1,7 @@
 package main
 
 import (
-	"go-upcycle_connect-backend/cmd"
+	"go-training-backend/cmd"
 	"os"
 )
 

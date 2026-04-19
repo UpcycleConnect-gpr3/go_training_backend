@@ -1,7 +1,7 @@
 package source_middleware
 
 import (
-	"go-upcycle_connect-backend/utils/response"
+	"authentication_backend/utils/response"
 	"net/http"
 )
 

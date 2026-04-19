@@ -1,9 +1,9 @@
 package training_content_models
 
 import (
-	"database/sql"
 	"fmt"
 	"go-training-backend/database"
+	"go-training-backend/utils/db"
 	"go-training-backend/utils/log"
 	"time"
 )
@@ -19,6 +19,14 @@ type TrainingContent struct {
 	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
 }
 
+func (tc *TrainingContent) Get(columns []string, by string, value any) error {
+	return db.GetQuery[TrainingContent](database.Training, TABLE, columns, by, value, tc)
+}
+
+func (tc *TrainingContent) All(columns []string, dest *[]TrainingContent) error {
+	return db.AllQuery[TrainingContent](database.Training, TABLE, columns, dest)
+}
+
 type CreateTrainingContentDTO struct {
 	Type    string
 	Name    string
@@ -29,51 +37,6 @@ type UpdateTrainingContentDTO struct {
 	Type    string
 	Name    string
 	Content string
-}
-
-func GetAllTrainingContent(page, limit int) []TrainingContent {
-	action := "SELECT " + TABLE + " (paginated)"
-	offset := (page - 1) * limit
-
-	rows, err := database.Training.Query(
-		"SELECT id, type, name, content, created_at, updated_at FROM "+TABLE+" LIMIT ? OFFSET ?",
-		limit, offset,
-	)
-	if err != nil {
-		log.Database(action, err)
-		return []TrainingContent{}
-	}
-	defer rows.Close()
-
-	items := []TrainingContent{}
-	for rows.Next() {
-		var tc TrainingContent
-		if err := rows.Scan(&tc.Id, &tc.Type, &tc.Name, &tc.Content, &tc.CreatedAt, &tc.UpdatedAt); err != nil {
-			log.Database(action, err)
-			continue
-		}
-		items = append(items, tc)
-	}
-	return items
-}
-
-func GetTrainingContentByID(id int) *TrainingContent {
-	action := fmt.Sprintf("SELECT "+TABLE+" WHERE id : %d", id)
-	tc := TrainingContent{}
-
-	row := database.Training.QueryRow(
-		"SELECT id, type, name, content, created_at, updated_at FROM "+TABLE+" WHERE id = ?",
-		id,
-	)
-	err := row.Scan(&tc.Id, &tc.Type, &tc.Name, &tc.Content, &tc.CreatedAt, &tc.UpdatedAt)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil
-		}
-		log.Database(action, err)
-		return nil
-	}
-	return &tc
 }
 
 func CreateTrainingContent(dto CreateTrainingContentDTO) *TrainingContent {
@@ -92,7 +55,7 @@ func CreateTrainingContent(dto CreateTrainingContentDTO) *TrainingContent {
 		log.Database(action, err)
 		return nil
 	}
-	return GetTrainingContentByID(int(id))
+	return &TrainingContent{Id: int(id)}
 }
 
 func UpdateTrainingContent(id int, dto UpdateTrainingContentDTO) *TrainingContent {
@@ -106,7 +69,7 @@ func UpdateTrainingContent(id int, dto UpdateTrainingContentDTO) *TrainingConten
 		log.Database(action, err)
 		return nil
 	}
-	return GetTrainingContentByID(id)
+	return &TrainingContent{Id: id}
 }
 
 func DeleteTrainingContent(id int) {

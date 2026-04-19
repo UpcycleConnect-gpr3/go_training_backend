@@ -5,42 +5,39 @@ import (
 	"go-training-backend/app/actions/training_content_actions"
 	"go-training-backend/app/models/training_content_models"
 	"go-training-backend/utils/log"
+	"go-training-backend/utils/request"
 	"go-training-backend/utils/response"
 	"net/http"
-	"strconv"
 )
-
-func parsePage(r *http.Request) (int, int) {
-	page, err := strconv.Atoi(r.URL.Query().Get("page"))
-	if err != nil || page < 1 {
-		page = 1
-	}
-	limit, err := strconv.Atoi(r.URL.Query().Get("limit"))
-	if err != nil || limit < 1 {
-		limit = 20
-	}
-	return page, limit
-}
 
 func GetTrainingContentsHandler(w http.ResponseWriter, r *http.Request) {
 	log.Api(r)
 
-	page, limit := parsePage(r)
-	content := training_content_models.GetAllTrainingContent(page, limit)
-	response.NewSuccessData(w, content)
+	var content training_content_models.TrainingContent
+	var contents []training_content_models.TrainingContent
+
+	columns := []string{"id", "type", "name", "content", "created_at", "updated_at"}
+
+	err := content.All(columns, &contents)
+	if err != nil {
+		response.NewErrorMessage(w, response.ErrInvalidValue, http.StatusInternalServerError)
+		return
+	}
+	response.NewSuccessData(w, contents)
 }
 
 func GetTrainingContentHandler(w http.ResponseWriter, r *http.Request) {
 	log.Api(r)
 
-	id, err := strconv.Atoi(r.PathValue("id"))
-	if err != nil {
-		response.NewErrorMessage(w, "Invalid id", http.StatusBadRequest)
+	id := request.Request(r, "id").ConvertToInt(w)
+	if id == -1 {
 		return
 	}
 
-	content := training_content_models.GetTrainingContentByID(id)
-	if content == nil {
+	var content training_content_models.TrainingContent
+	columns := []string{"id", "type", "name", "content", "created_at", "updated_at"}
+	err := content.Get(columns, "id = ?", id)
+	if err != nil {
 		response.NewErrorMessage(w, response.ErrTrainingContentNotFound, http.StatusNotFound)
 		return
 	}
@@ -69,13 +66,15 @@ func CreateTrainingContentHandler(w http.ResponseWriter, r *http.Request) {
 func UpdateTrainingContentHandler(w http.ResponseWriter, r *http.Request) {
 	log.Api(r)
 
-	id, err := strconv.Atoi(r.PathValue("id"))
-	if err != nil {
-		response.NewErrorMessage(w, "Invalid id", http.StatusBadRequest)
+	id := request.Request(r, "id").ConvertToInt(w)
+	if id == -1 {
 		return
 	}
 
-	if training_content_models.GetTrainingContentByID(id) == nil {
+	var content training_content_models.TrainingContent
+	columns := []string{"id"}
+	err := content.Get(columns, "id = ?", id)
+	if err != nil {
 		response.NewErrorMessage(w, response.ErrTrainingContentNotFound, http.StatusNotFound)
 		return
 	}
@@ -86,25 +85,27 @@ func UpdateTrainingContentHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	validationErrors, content := training_content_actions.UpdateTrainingContent(id, dto)
+	validationErrors, updatedContent := training_content_actions.UpdateTrainingContent(id, dto)
 	if len(validationErrors) > 0 {
 		response.NewValidationError(w, response.ErrInvalidBody, validationErrors)
 		return
 	}
 
-	response.NewSuccessData(w, content)
+	response.NewSuccessData(w, updatedContent)
 }
 
 func DeleteTrainingContentHandler(w http.ResponseWriter, r *http.Request) {
 	log.Api(r)
 
-	id, err := strconv.Atoi(r.PathValue("id"))
-	if err != nil {
-		response.NewErrorMessage(w, "Invalid id", http.StatusBadRequest)
+	id := request.Request(r, "id").ConvertToInt(w)
+	if id == -1 {
 		return
 	}
 
-	if training_content_models.GetTrainingContentByID(id) == nil {
+	var content training_content_models.TrainingContent
+	columns := []string{"id"}
+	err := content.Get(columns, "id = ?", id)
+	if err != nil {
 		response.NewErrorMessage(w, response.ErrTrainingContentNotFound, http.StatusNotFound)
 		return
 	}

@@ -5,27 +5,18 @@ import (
 	"go-training-backend/database"
 	"go-training-backend/utils/db"
 	"go-training-backend/utils/log"
-	"time"
 )
 
 const TABLE = "CURRICULA"
 
 type Curricula struct {
-	Id              int       `json:"id"`
-	Path            string    `json:"path"`
-	Name            string    `json:"name"`
-	Description     string    `json:"description"`
-	CreatedByUserID string    `db:"created_by_user_id" json:"created_by_user_id"`
-	CreatedAt       time.Time `db:"created_at" json:"created_at"`
-	UpdatedAt       time.Time `db:"updated_at" json:"updated_at"`
-}
-
-func (c *Curricula) Get(columns []string, by string, value any) error {
-	return db.GetQuery[Curricula](database.Training, TABLE, columns, by, value, c)
-}
-
-func (c *Curricula) All(columns []string, dest *[]Curricula) error {
-	return db.AllQuery[Curricula](database.Training, TABLE, columns, dest)
+	Id              int    `json:"id"`
+	Path            string `json:"path"`
+	Name            string `json:"name"`
+	Description     string `json:"description"`
+	CreatedByUserID string `db:"created_by_user_id" json:"created_by_user_id"`
+	CreatedAt       string `db:"created_at" json:"created_at"`
+	UpdatedAt       string `db:"updated_at" json:"updated_at"`
 }
 
 type CreateCurriculaDTO struct {
@@ -39,6 +30,14 @@ type UpdateCurriculaDTO struct {
 	Path        string
 	Name        string
 	Description string
+}
+
+func (c *Curricula) Get(columns []string, by string, value any) error {
+	return db.GetQuery[Curricula](database.Training, TABLE, columns, by, value, c)
+}
+
+func (c *Curricula) All(columns []string, dest *[]Curricula) error {
+	return db.AllQuery[Curricula](database.Training, TABLE, columns, dest)
 }
 
 func CreateCurricula(dto CreateCurriculaDTO) *Curricula {

@@ -47,7 +47,6 @@ type UpdateContentScheduleDTO struct {
 	OrderPosition     int
 }
 
-// Get and All methods
 func (cs *ContentSchedule) Get(columns []string, by string, value any) error {
 	return db.GetQuery[ContentSchedule](database.Training, TABLE, columns, by, value, cs)
 }

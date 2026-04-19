@@ -5,28 +5,18 @@ import (
 	"go-training-backend/database"
 	"go-training-backend/utils/db"
 	"go-training-backend/utils/log"
-	"time"
 )
 
 const TABLE = "TRAINING_CONTENT"
 
 type TrainingContent struct {
-	Id        int       `json:"id"`
-	Type      string    `json:"type"`
-	Name      string    `json:"name"`
-	Content   string    `json:"content"`
-	CreatedAt time.Time `db:"created_at" json:"created_at"`
-	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
+	Id        int    `json:"id"`
+	Type      string `json:"type"`
+	Name      string `json:"name"`
+	Content   string `json:"content"`
+	CreatedAt string `db:"created_at" json:"created_at"`
+	UpdatedAt string `db:"updated_at" json:"updated_at"`
 }
-
-func (tc *TrainingContent) Get(columns []string, by string, value any) error {
-	return db.GetQuery[TrainingContent](database.Training, TABLE, columns, by, value, tc)
-}
-
-func (tc *TrainingContent) All(columns []string, dest *[]TrainingContent) error {
-	return db.AllQuery[TrainingContent](database.Training, TABLE, columns, dest)
-}
-
 type CreateTrainingContentDTO struct {
 	Type    string
 	Name    string
@@ -37,6 +27,14 @@ type UpdateTrainingContentDTO struct {
 	Type    string
 	Name    string
 	Content string
+}
+
+func (tc *TrainingContent) Get(columns []string, by string, value any) error {
+	return db.GetQuery[TrainingContent](database.Training, TABLE, columns, by, value, tc)
+}
+
+func (tc *TrainingContent) All(columns []string, dest *[]TrainingContent) error {
+	return db.AllQuery[TrainingContent](database.Training, TABLE, columns, dest)
 }
 
 func CreateTrainingContent(dto CreateTrainingContentDTO) *TrainingContent {

@@ -1,37 +1,27 @@
 package training_models
 
 import (
-	"database/sql"
 	"fmt"
 	"go-training-backend/database"
 	"go-training-backend/utils/db"
 	"go-training-backend/utils/log"
-	"time"
 )
 
 const TABLE = "TRAININGS"
 
 type Training struct {
-	Id                          int       `json:"id"`
-	Type                        string    `json:"type"`
-	Name                        string    `json:"name"`
-	ModeOfDelivery              string    `db:"mode_of_delivery" json:"mode_of_delivery"`
-	Duration                    string    `json:"duration"`
-	TargetAudience              string    `db:"target_audience" json:"target_audience"`
-	MinimumNumberOfParticipants int       `db:"minimum_number_of_participants" json:"minimum_number_of_participants"`
-	MaximumNumberOfParticipants int       `db:"maximum_number_of_participants" json:"maximum_number_of_participants"`
-	Location                    string    `json:"location"`
-	TrainerProfile              string    `db:"trainer_profile" json:"trainer_profile"`
-	CreatedAt                   time.Time `db:"created_at" json:"created_at"`
-	UpdatedAt                   time.Time `db:"updated_at" json:"updated_at"`
-}
-
-func (t *Training) Get(columns []string, by string, value any) error {
-	return db.GetQuery[Training](database.Training, TABLE, columns, by, value, t)
-}
-
-func (t *Training) All(columns []string, dest *[]Training) error {
-	return db.AllQuery[Training](database.Training, TABLE, columns, dest)
+	Id                          int    `json:"id"`
+	Type                        string `json:"type"`
+	Name                        string `json:"name"`
+	ModeOfDelivery              string `db:"mode_of_delivery" json:"mode_of_delivery"`
+	Duration                    string `json:"duration"`
+	TargetAudience              string `db:"target_audience" json:"target_audience"`
+	MinimumNumberOfParticipants int    `db:"minimum_number_of_participants" json:"minimum_number_of_participants"`
+	MaximumNumberOfParticipants int    `db:"maximum_number_of_participants" json:"maximum_number_of_participants"`
+	Location                    string `json:"location"`
+	TrainerProfile              string `db:"trainer_profile" json:"trainer_profile"`
+	CreatedAt                   string `db:"created_at" json:"created_at"`
+	UpdatedAt                   string `db:"updated_at" json:"updated_at"`
 }
 
 type CreateTrainingDTO struct {
@@ -68,6 +58,14 @@ type TrainingContentSummary struct {
 	Id   int    `json:"id"`
 	Name string `json:"name"`
 	Type string `json:"type"`
+}
+
+func (t *Training) Get(columns []string, by string, value any) error {
+	return db.GetQuery[Training](database.Training, TABLE, columns, by, value, t)
+}
+
+func (t *Training) All(columns []string, dest *[]Training) error {
+	return db.AllQuery[Training](database.Training, TABLE, columns, dest)
 }
 
 func CreateTraining(dto CreateTrainingDTO) *Training {

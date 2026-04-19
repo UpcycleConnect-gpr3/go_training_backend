@@ -1,8 +1,8 @@
 package db
 
 import (
-	"authentication_backend/utils/log"
-	"authentication_backend/utils/sql_builder"
+	"go-training-backend/utils/log"
+	"go-training-backend/utils/sql_builder"
 
 	"github.com/jmoiron/sqlx"
 )

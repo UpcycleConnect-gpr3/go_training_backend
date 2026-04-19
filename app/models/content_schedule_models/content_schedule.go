@@ -1,28 +1,27 @@
 package content_schedule_models
 
 import (
-	"database/sql"
 	"fmt"
 	"go-training-backend/database"
+	"go-training-backend/utils/db"
 	"go-training-backend/utils/log"
-	"time"
 )
 
 const TABLE = "CONTENT_AND_SCHEDULES"
 
 type ContentSchedule struct {
-	Id                int       `json:"id"`
-	Title             string    `json:"title"`
-	DayNumber         int       `db:"day_number" json:"day_number"`
-	Duration          string    `json:"duration"`
-	Description       string    `json:"description"`
-	Content           string    `json:"content"`
-	IsPractical       bool      `db:"is_practical" json:"is_practical"`
-	ResourcesRequired string    `db:"resources_required" json:"resources_required"`
-	OrderPosition     int       `db:"order_position" json:"order_position"`
-	TrainingID        int       `db:"training_id" json:"training_id"`
-	CreatedAt         time.Time `db:"created_at" json:"created_at"`
-	UpdatedAt         time.Time `db:"updated_at" json:"updated_at"`
+	Id                int    `json:"id"`
+	Title             string `json:"title"`
+	DayNumber         int    `db:"day_number" json:"day_number"`
+	Duration          string `json:"duration"`
+	Description       string `json:"description"`
+	Content           string `json:"content"`
+	IsPractical       bool   `db:"is_practical" json:"is_practical"`
+	ResourcesRequired string `db:"resources_required" json:"resources_required"`
+	OrderPosition     int    `db:"order_position" json:"order_position"`
+	TrainingID        int    `db:"training_id" json:"training_id"`
+	CreatedAt         string `db:"created_at" json:"created_at"`
+	UpdatedAt         string `db:"updated_at" json:"updated_at"`
 }
 
 type CreateContentScheduleDTO struct {
@@ -48,57 +47,13 @@ type UpdateContentScheduleDTO struct {
 	OrderPosition     int
 }
 
-func GetAllContentSchedules(page, limit int) []ContentSchedule {
-	action := "SELECT " + TABLE + " (paginated)"
-	offset := (page - 1) * limit
-
-	rows, err := database.Training.Query(
-		"SELECT id, title, day_number, duration, description, content, is_practical, resources_required, order_position, training_id, created_at, updated_at FROM "+TABLE+" LIMIT ? OFFSET ?",
-		limit, offset,
-	)
-	if err != nil {
-		log.Database(action, err)
-		return []ContentSchedule{}
-	}
-	defer rows.Close()
-
-	schedules := []ContentSchedule{}
-	for rows.Next() {
-		var s ContentSchedule
-		if err := rows.Scan(
-			&s.Id, &s.Title, &s.DayNumber, &s.Duration, &s.Description,
-			&s.Content, &s.IsPractical, &s.ResourcesRequired, &s.OrderPosition,
-			&s.TrainingID, &s.CreatedAt, &s.UpdatedAt,
-		); err != nil {
-			log.Database(action, err)
-			continue
-		}
-		schedules = append(schedules, s)
-	}
-	return schedules
+// Get and All methods
+func (cs *ContentSchedule) Get(columns []string, by string, value any) error {
+	return db.GetQuery[ContentSchedule](database.Training, TABLE, columns, by, value, cs)
 }
 
-func GetContentScheduleByID(id int) *ContentSchedule {
-	action := fmt.Sprintf("SELECT "+TABLE+" WHERE id : %d", id)
-	s := ContentSchedule{}
-
-	row := database.Training.QueryRow(
-		"SELECT id, title, day_number, duration, description, content, is_practical, resources_required, order_position, training_id, created_at, updated_at FROM "+TABLE+" WHERE id = ?",
-		id,
-	)
-	err := row.Scan(
-		&s.Id, &s.Title, &s.DayNumber, &s.Duration, &s.Description,
-		&s.Content, &s.IsPractical, &s.ResourcesRequired, &s.OrderPosition,
-		&s.TrainingID, &s.CreatedAt, &s.UpdatedAt,
-	)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil
-		}
-		log.Database(action, err)
-		return nil
-	}
-	return &s
+func (cs *ContentSchedule) All(columns []string, dest *[]ContentSchedule) error {
+	return db.AllQuery[ContentSchedule](database.Training, TABLE, columns, dest)
 }
 
 func GetSchedulesByTrainingID(trainingID int) []ContentSchedule {
@@ -147,7 +102,7 @@ func CreateContentSchedule(dto CreateContentScheduleDTO) *ContentSchedule {
 		log.Database(action, err)
 		return nil
 	}
-	return GetContentScheduleByID(int(id))
+	return &ContentSchedule{Id: int(id)}
 }
 
 func UpdateContentSchedule(id int, dto UpdateContentScheduleDTO) *ContentSchedule {
@@ -162,7 +117,7 @@ func UpdateContentSchedule(id int, dto UpdateContentScheduleDTO) *ContentSchedul
 		log.Database(action, err)
 		return nil
 	}
-	return GetContentScheduleByID(id)
+	return &ContentSchedule{Id: id}
 }
 
 func DeleteContentSchedule(id int) {

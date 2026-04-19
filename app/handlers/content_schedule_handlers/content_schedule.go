@@ -5,42 +5,39 @@ import (
 	"go-training-backend/app/actions/content_schedule_actions"
 	"go-training-backend/app/models/content_schedule_models"
 	"go-training-backend/utils/log"
+	"go-training-backend/utils/request"
 	"go-training-backend/utils/response"
 	"net/http"
-	"strconv"
 )
-
-func parsePage(r *http.Request) (int, int) {
-	page, err := strconv.Atoi(r.URL.Query().Get("page"))
-	if err != nil || page < 1 {
-		page = 1
-	}
-	limit, err := strconv.Atoi(r.URL.Query().Get("limit"))
-	if err != nil || limit < 1 {
-		limit = 20
-	}
-	return page, limit
-}
 
 func GetContentSchedulesHandler(w http.ResponseWriter, r *http.Request) {
 	log.Api(r)
 
-	page, limit := parsePage(r)
-	schedules := content_schedule_models.GetAllContentSchedules(page, limit)
+	var schedule content_schedule_models.ContentSchedule
+	var schedules []content_schedule_models.ContentSchedule
+
+	columns := []string{"id", "title", "day_number", "duration", "description", "content", "is_practical", "resources_required", "order_position", "training_id", "created_at", "updated_at"}
+
+	err := schedule.All(columns, &schedules)
+	if err != nil {
+		response.NewErrorMessage(w, response.ErrInvalidValue, http.StatusInternalServerError)
+		return
+	}
 	response.NewSuccessData(w, schedules)
 }
 
 func GetContentScheduleHandler(w http.ResponseWriter, r *http.Request) {
 	log.Api(r)
 
-	id, err := strconv.Atoi(r.PathValue("id"))
-	if err != nil {
-		response.NewErrorMessage(w, "Invalid id", http.StatusBadRequest)
+	id := request.Request(r, "id").ConvertToInt(w)
+	if id == -1 {
 		return
 	}
 
-	schedule := content_schedule_models.GetContentScheduleByID(id)
-	if schedule == nil {
+	var schedule content_schedule_models.ContentSchedule
+	columns := []string{"id", "title", "day_number", "duration", "description", "content", "is_practical", "resources_required", "order_position", "training_id", "created_at", "updated_at"}
+	err := schedule.Get(columns, "id = ?", id)
+	if err != nil {
 		response.NewErrorMessage(w, response.ErrScheduleNotFound, http.StatusNotFound)
 		return
 	}
@@ -69,13 +66,15 @@ func CreateContentScheduleHandler(w http.ResponseWriter, r *http.Request) {
 func UpdateContentScheduleHandler(w http.ResponseWriter, r *http.Request) {
 	log.Api(r)
 
-	id, err := strconv.Atoi(r.PathValue("id"))
-	if err != nil {
-		response.NewErrorMessage(w, "Invalid id", http.StatusBadRequest)
+	id := request.Request(r, "id").ConvertToInt(w)
+	if id == -1 {
 		return
 	}
 
-	if content_schedule_models.GetContentScheduleByID(id) == nil {
+	var schedule content_schedule_models.ContentSchedule
+	columns := []string{"id"}
+	err := schedule.Get(columns, "id = ?", id)
+	if err != nil {
 		response.NewErrorMessage(w, response.ErrScheduleNotFound, http.StatusNotFound)
 		return
 	}
@@ -86,25 +85,27 @@ func UpdateContentScheduleHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	validationErrors, schedule := content_schedule_actions.UpdateContentSchedule(id, dto)
+	validationErrors, updatedSchedule := content_schedule_actions.UpdateContentSchedule(id, dto)
 	if len(validationErrors) > 0 {
 		response.NewValidationError(w, response.ErrInvalidBody, validationErrors)
 		return
 	}
 
-	response.NewSuccessData(w, schedule)
+	response.NewSuccessData(w, updatedSchedule)
 }
 
 func DeleteContentScheduleHandler(w http.ResponseWriter, r *http.Request) {
 	log.Api(r)
 
-	id, err := strconv.Atoi(r.PathValue("id"))
-	if err != nil {
-		response.NewErrorMessage(w, "Invalid id", http.StatusBadRequest)
+	id := request.Request(r, "id").ConvertToInt(w)
+	if id == -1 {
 		return
 	}
 
-	if content_schedule_models.GetContentScheduleByID(id) == nil {
+	var schedule content_schedule_models.ContentSchedule
+	columns := []string{"id"}
+	err := schedule.Get(columns, "id = ?", id)
+	if err != nil {
 		response.NewErrorMessage(w, response.ErrScheduleNotFound, http.StatusNotFound)
 		return
 	}

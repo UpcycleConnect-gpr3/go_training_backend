@@ -1,7 +1,7 @@
 package source_middleware
 
 import (
-	"authentication_backend/utils/response"
+	"go-training-backend/utils/response"
 	"net/http"
 )
 

@@ -1,7 +1,7 @@
 package ratelimit_middleware
 
 import (
-	"authentication_backend/utils/response"
+	"go-training-backend/utils/response"
 	"net/http"
 	"sync"
 	"time"

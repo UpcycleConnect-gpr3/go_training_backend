@@ -1,9 +1,9 @@
 package auth_middleware
 
 import (
-	"authentication_backend/utils/jwt"
-	"authentication_backend/utils/log"
 	"context"
+	"go-training-backend/utils/jwt"
+	"go-training-backend/utils/log"
 	"net/http"
 )
 

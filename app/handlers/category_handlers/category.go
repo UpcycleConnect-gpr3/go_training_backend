@@ -3,45 +3,42 @@ package category_handlers
 import (
 	"encoding/json"
 	"go-training-backend/app/actions/category_actions"
-	"go-training-backend/app/middleware/auth_middleware"
 	"go-training-backend/app/models/category_models"
+	"go-training-backend/utils/auth"
 	"go-training-backend/utils/log"
+	"go-training-backend/utils/request"
 	"go-training-backend/utils/response"
 	"net/http"
-	"strconv"
 )
-
-func parsePage(r *http.Request) (int, int) {
-	page, err := strconv.Atoi(r.URL.Query().Get("page"))
-	if err != nil || page < 1 {
-		page = 1
-	}
-	limit, err := strconv.Atoi(r.URL.Query().Get("limit"))
-	if err != nil || limit < 1 {
-		limit = 20
-	}
-	return page, limit
-}
 
 func GetCategoriesHandler(w http.ResponseWriter, r *http.Request) {
 	log.Api(r)
 
-	page, limit := parsePage(r)
-	categories := category_models.GetAllCategories(page, limit)
+	var category category_models.Category
+	var categories []category_models.Category
+
+	columns := []string{"id", "name", "slug", "description", "created_by_user_id", "created_at", "updated_at"}
+
+	err := category.All(columns, &categories)
+	if err != nil {
+		response.NewErrorMessage(w, response.ErrInvalidValue, http.StatusInternalServerError)
+		return
+	}
 	response.NewSuccessData(w, categories)
 }
 
 func GetCategoryHandler(w http.ResponseWriter, r *http.Request) {
 	log.Api(r)
 
-	id, err := strconv.Atoi(r.PathValue("id"))
-	if err != nil {
-		response.NewErrorMessage(w, "Invalid id", http.StatusBadRequest)
+	id := request.Request(r, "id").ConvertToInt(w)
+	if id == -1 {
 		return
 	}
 
-	category := category_models.GetCategoryByID(id)
-	if category == nil {
+	var category category_models.Category
+	columns := []string{"id", "name", "slug", "description", "created_by_user_id", "created_at", "updated_at"}
+	err := category.Get(columns, "id = ?", id)
+	if err != nil {
 		response.NewErrorMessage(w, response.ErrCategoryNotFound, http.StatusNotFound)
 		return
 	}
@@ -52,7 +49,7 @@ func GetCategoryHandler(w http.ResponseWriter, r *http.Request) {
 func CreateCategoryHandler(w http.ResponseWriter, r *http.Request) {
 	log.Api(r)
 
-	userID := auth_middleware.GetUserId(r.Context())
+	userID := auth.Auth(r).Id()
 
 	var dto category_actions.CreateCategoryDTO
 	if err := json.NewDecoder(r.Body).Decode(&dto); err != nil {
@@ -72,13 +69,15 @@ func CreateCategoryHandler(w http.ResponseWriter, r *http.Request) {
 func UpdateCategoryHandler(w http.ResponseWriter, r *http.Request) {
 	log.Api(r)
 
-	id, err := strconv.Atoi(r.PathValue("id"))
-	if err != nil {
-		response.NewErrorMessage(w, "Invalid id", http.StatusBadRequest)
+	id := request.Request(r, "id").ConvertToInt(w)
+	if id == -1 {
 		return
 	}
 
-	if category_models.GetCategoryByID(id) == nil {
+	var category category_models.Category
+	columns := []string{"id"}
+	err := category.Get(columns, "id = ?", id)
+	if err != nil {
 		response.NewErrorMessage(w, response.ErrCategoryNotFound, http.StatusNotFound)
 		return
 	}
@@ -89,25 +88,27 @@ func UpdateCategoryHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	validationErrors, category := category_actions.UpdateCategory(id, dto)
+	validationErrors, updatedCategory := category_actions.UpdateCategory(id, dto)
 	if len(validationErrors) > 0 {
 		response.NewValidationError(w, response.ErrInvalidBody, validationErrors)
 		return
 	}
 
-	response.NewSuccessData(w, category)
+	response.NewSuccessData(w, updatedCategory)
 }
 
 func DeleteCategoryHandler(w http.ResponseWriter, r *http.Request) {
 	log.Api(r)
 
-	id, err := strconv.Atoi(r.PathValue("id"))
-	if err != nil {
-		response.NewErrorMessage(w, "Invalid id", http.StatusBadRequest)
+	id := request.Request(r, "id").ConvertToInt(w)
+	if id == -1 {
 		return
 	}
 
-	if category_models.GetCategoryByID(id) == nil {
+	var category category_models.Category
+	columns := []string{"id"}
+	err := category.Get(columns, "id = ?", id)
+	if err != nil {
 		response.NewErrorMessage(w, response.ErrCategoryNotFound, http.StatusNotFound)
 		return
 	}

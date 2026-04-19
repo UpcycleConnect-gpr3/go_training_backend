@@ -1,23 +1,22 @@
 package category_models
 
 import (
-	"database/sql"
 	"fmt"
 	"go-training-backend/database"
+	"go-training-backend/utils/db"
 	"go-training-backend/utils/log"
-	"time"
 )
 
 const TABLE = "CATEGORIES"
 
 type Category struct {
-	Id              int       `json:"id"`
-	Name            string    `json:"name"`
-	Slug            string    `json:"slug"`
-	Description     string    `json:"description"`
-	CreatedByUserID string    `db:"created_by_user_id" json:"created_by_user_id"`
-	CreatedAt       time.Time `db:"created_at" json:"created_at"`
-	UpdatedAt       time.Time `db:"updated_at" json:"updated_at"`
+	Id              int    `json:"id"`
+	Name            string `json:"name"`
+	Slug            string `json:"slug"`
+	Description     string `json:"description"`
+	CreatedByUserID string `db:"created_by_user_id" json:"created_by_user_id"`
+	CreatedAt       string `db:"created_at" json:"created_at"`
+	UpdatedAt       string `db:"updated_at" json:"updated_at"`
 }
 
 type CreateCategoryDTO struct {
@@ -33,49 +32,12 @@ type UpdateCategoryDTO struct {
 	Description string
 }
 
-func GetAllCategories(page, limit int) []Category {
-	action := "SELECT " + TABLE + " (paginated)"
-	offset := (page - 1) * limit
-
-	rows, err := database.Training.Query(
-		"SELECT id, name, slug, description, created_by_user_id, created_at, updated_at FROM "+TABLE+" LIMIT ? OFFSET ?",
-		limit, offset,
-	)
-	if err != nil {
-		log.Database(action, err)
-		return []Category{}
-	}
-	defer rows.Close()
-
-	categories := []Category{}
-	for rows.Next() {
-		var c Category
-		if err := rows.Scan(&c.Id, &c.Name, &c.Slug, &c.Description, &c.CreatedByUserID, &c.CreatedAt, &c.UpdatedAt); err != nil {
-			log.Database(action, err)
-			continue
-		}
-		categories = append(categories, c)
-	}
-	return categories
+func (category *Category) Get(columns []string, by string, value any) error {
+	return db.GetQuery[Category](database.Training, TABLE, columns, by, value, category)
 }
 
-func GetCategoryByID(id int) *Category {
-	action := fmt.Sprintf("SELECT "+TABLE+" WHERE id : %d", id)
-	c := Category{}
-
-	row := database.Training.QueryRow(
-		"SELECT id, name, slug, description, created_by_user_id, created_at, updated_at FROM "+TABLE+" WHERE id = ?",
-		id,
-	)
-	err := row.Scan(&c.Id, &c.Name, &c.Slug, &c.Description, &c.CreatedByUserID, &c.CreatedAt, &c.UpdatedAt)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil
-		}
-		log.Database(action, err)
-		return nil
-	}
-	return &c
+func (category *Category) All(columns []string, dest *[]Category) error {
+	return db.AllQuery[Category](database.Training, TABLE, columns, dest)
 }
 
 func CreateCategory(dto CreateCategoryDTO) *Category {
@@ -94,7 +56,7 @@ func CreateCategory(dto CreateCategoryDTO) *Category {
 		log.Database(action, err)
 		return nil
 	}
-	return GetCategoryByID(int(id))
+	return &Category{Id: int(id)}
 }
 
 func UpdateCategory(id int, dto UpdateCategoryDTO) *Category {
@@ -108,7 +70,7 @@ func UpdateCategory(id int, dto UpdateCategoryDTO) *Category {
 		log.Database(action, err)
 		return nil
 	}
-	return GetCategoryByID(id)
+	return &Category{Id: int(id)}
 }
 
 func DeleteCategory(id int) {

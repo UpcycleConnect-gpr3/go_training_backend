@@ -1,9 +1,9 @@
 package curricula_models
 
 import (
-	"database/sql"
 	"fmt"
 	"go-training-backend/database"
+	"go-training-backend/utils/db"
 	"go-training-backend/utils/log"
 	"time"
 )
@@ -20,6 +20,14 @@ type Curricula struct {
 	UpdatedAt       time.Time `db:"updated_at" json:"updated_at"`
 }
 
+func (c *Curricula) Get(columns []string, by string, value any) error {
+	return db.GetQuery[Curricula](database.Training, TABLE, columns, by, value, c)
+}
+
+func (c *Curricula) All(columns []string, dest *[]Curricula) error {
+	return db.AllQuery[Curricula](database.Training, TABLE, columns, dest)
+}
+
 type CreateCurriculaDTO struct {
 	Path            string
 	Name            string
@@ -31,51 +39,6 @@ type UpdateCurriculaDTO struct {
 	Path        string
 	Name        string
 	Description string
-}
-
-func GetAllCurricula(page, limit int) []Curricula {
-	action := "SELECT " + TABLE + " (paginated)"
-	offset := (page - 1) * limit
-
-	rows, err := database.Training.Query(
-		"SELECT id, path, name, description, created_by_user_id, created_at, updated_at FROM "+TABLE+" LIMIT ? OFFSET ?",
-		limit, offset,
-	)
-	if err != nil {
-		log.Database(action, err)
-		return []Curricula{}
-	}
-	defer rows.Close()
-
-	curricula := []Curricula{}
-	for rows.Next() {
-		var c Curricula
-		if err := rows.Scan(&c.Id, &c.Path, &c.Name, &c.Description, &c.CreatedByUserID, &c.CreatedAt, &c.UpdatedAt); err != nil {
-			log.Database(action, err)
-			continue
-		}
-		curricula = append(curricula, c)
-	}
-	return curricula
-}
-
-func GetCurriculaByID(id int) *Curricula {
-	action := fmt.Sprintf("SELECT "+TABLE+" WHERE id : %d", id)
-	c := Curricula{}
-
-	row := database.Training.QueryRow(
-		"SELECT id, path, name, description, created_by_user_id, created_at, updated_at FROM "+TABLE+" WHERE id = ?",
-		id,
-	)
-	err := row.Scan(&c.Id, &c.Path, &c.Name, &c.Description, &c.CreatedByUserID, &c.CreatedAt, &c.UpdatedAt)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil
-		}
-		log.Database(action, err)
-		return nil
-	}
-	return &c
 }
 
 func CreateCurricula(dto CreateCurriculaDTO) *Curricula {
@@ -94,7 +57,7 @@ func CreateCurricula(dto CreateCurriculaDTO) *Curricula {
 		log.Database(action, err)
 		return nil
 	}
-	return GetCurriculaByID(int(id))
+	return &Curricula{Id: int(id)}
 }
 
 func UpdateCurricula(id int, dto UpdateCurriculaDTO) *Curricula {
@@ -108,7 +71,7 @@ func UpdateCurricula(id int, dto UpdateCurriculaDTO) *Curricula {
 		log.Database(action, err)
 		return nil
 	}
-	return GetCurriculaByID(id)
+	return &Curricula{Id: id}
 }
 
 func DeleteCurricula(id int) {

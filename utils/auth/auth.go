@@ -1,9 +1,9 @@
 package auth
 
 import (
-	"authentication_backend/app/middleware/auth_middleware"
-	"authentication_backend/app/models/user_models"
-	"authentication_backend/utils/response"
+	"go-training-backend/app/middleware/auth_middleware"
+	"go-training-backend/app/models/user_models"
+	"go-training-backend/utils/response"
 	"net/http"
 )
 

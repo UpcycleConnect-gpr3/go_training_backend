@@ -63,7 +63,7 @@ func CreateCategoryHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.NewSuccessData(w, category)
+	response.NewSuccessData(w, map[string]int{"category_id": category.Id})
 }
 
 func UpdateCategoryHandler(w http.ResponseWriter, r *http.Request) {
@@ -94,7 +94,7 @@ func UpdateCategoryHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.NewSuccessData(w, updatedCategory)
+	response.NewSuccessData(w, map[string]int{"category_id": updatedCategory.Id})
 }
 
 func DeleteCategoryHandler(w http.ResponseWriter, r *http.Request) {

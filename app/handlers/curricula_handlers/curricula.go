@@ -63,7 +63,7 @@ func CreateCurriculumHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.NewSuccessData(w, curricula)
+	response.NewSuccessData(w, map[string]int{"curriculum_id": curricula.Id})
 }
 
 func UpdateCurriculumHandler(w http.ResponseWriter, r *http.Request) {
@@ -94,7 +94,7 @@ func UpdateCurriculumHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.NewSuccessData(w, updatedCurriculum)
+	response.NewSuccessData(w, map[string]int{"curriculum_id": updatedCurriculum.Id})
 }
 
 func DeleteCurriculumHandler(w http.ResponseWriter, r *http.Request) {

@@ -60,7 +60,7 @@ func CreateContentScheduleHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.NewSuccessData(w, schedule)
+	response.NewSuccessData(w, map[string]int{"content_schedule_id": schedule.Id})
 }
 
 func UpdateContentScheduleHandler(w http.ResponseWriter, r *http.Request) {
@@ -91,7 +91,7 @@ func UpdateContentScheduleHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.NewSuccessData(w, updatedSchedule)
+	response.NewSuccessData(w, map[string]int{"content_schedule_id": updatedSchedule.Id})
 }
 
 func DeleteContentScheduleHandler(w http.ResponseWriter, r *http.Request) {

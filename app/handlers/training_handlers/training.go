@@ -61,7 +61,7 @@ func CreateTrainingHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.NewSuccessData(w, training)
+	response.NewSuccessData(w, map[string]int{"training_id": training.Id})
 }
 
 func UpdateTrainingHandler(w http.ResponseWriter, r *http.Request) {
@@ -92,7 +92,7 @@ func UpdateTrainingHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.NewSuccessData(w, updatedTraining)
+	response.NewSuccessData(w, map[string]int{"training_id": updatedTraining.Id})
 }
 
 func DeleteTrainingHandler(w http.ResponseWriter, r *http.Request) {

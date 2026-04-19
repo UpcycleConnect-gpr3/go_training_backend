@@ -1,10 +1,10 @@
 package database
 
 import (
-	"go-upcycle_connect-backend/config"
-	"go-upcycle_connect-backend/database"
-	"go-upcycle_connect-backend/internal"
-	"go-upcycle_connect-backend/utils/log"
+	"go-training-backend/config"
+	"go-training-backend/database"
+	"go-training-backend/internal"
+	"go-training-backend/utils/log"
 
 	"github.com/joho/godotenv"
 )
@@ -19,13 +19,13 @@ func initialize() {
 	// Config Initialization
 	config.InitDatabase()
 
-	err = database.UpcycleConnect.Ping()
+	err = database.Training.Ping()
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	internal.CreateTableMigrations(database.UpcycleConnect)
+	internal.CreateTableMigrations(database.Training)
 
 }
 
@@ -33,6 +33,6 @@ func Migrate() {
 
 	initialize()
 
-	internal.Migrate(database.UpcycleConnect)
+	internal.Migrate(database.Training)
 
 }

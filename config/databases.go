@@ -1,14 +1,14 @@
 package config
 
 import (
-	"go-upcycle_connect-backend/database"
-	"go-upcycle_connect-backend/internal"
+	"go-training-backend/database"
+	"go-training-backend/internal"
 	"os"
 )
 
 func InitDatabase() {
 
-	database.UpcycleConnect = internal.NewDatabase(
+	database.Training = internal.NewDatabase(
 		os.Getenv("DATABASE_USERNAME"),
 		os.Getenv("DATABASE_PASSWORD"),
 		os.Getenv("DATABASE_HOST"),

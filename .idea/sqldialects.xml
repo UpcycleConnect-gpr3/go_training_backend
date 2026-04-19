@@ -3,6 +3,22 @@
   <component name="SqlDialectMappings">
     <file url="file://$PROJECT_DIR$/database/migrations/00001_create_users_table.up.sql" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/database/migrations/00001_drop_users_table.down.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/database/migrations/00002_create_trainings_table.down.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/database/migrations/00002_create_trainings_table.up.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/database/migrations/00003_create_curricula_table.down.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/database/migrations/00003_create_curricula_table.up.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/database/migrations/00004_create_training_content_table.down.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/database/migrations/00004_create_training_content_table.up.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/database/migrations/00005_create_content_and_schedules_table.down.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/database/migrations/00005_create_content_and_schedules_table.up.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/database/migrations/00006_create_images_table.down.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/database/migrations/00006_create_images_table.up.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/database/migrations/00007_create_categories_table.down.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/database/migrations/00007_create_categories_table.up.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/database/migrations/00008_create_training_curriculum_tables.down.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/database/migrations/00008_create_training_curriculum_tables.up.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/database/migrations/00009_create_training_training_content_tables.down.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/database/migrations/00009_create_training_training_content_tables.up.sql" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/database/migrations/system/migration_table.sql" dialect="GenericSQL" />
   </component>
 </project>

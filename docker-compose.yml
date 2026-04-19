@@ -1,23 +1,23 @@
 services:
-  mariadb_auth:
+  mariadb_training:
     image: mariadb
-    container_name: mariadb_auth
+    container_name: mariadb_training
     environment:
       MARIADB_RANDOM_ROOT_PASSWORD: 1
       MARIADB_USER: gouser
       MARIADB_PASSWORD: password
-      MARIADB_DATABASE: go_auth
+      MARIADB_DATABASE: go_training
     ports:
-      - '3306:3306'
+      - '3308:3306'
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
-    container_name: phpmyadmin
+    container_name: phpmyadmin_training
     environment:
-      PMA_HOST: mariadb_auth
+      PMA_HOST: mariadb_training
       PMA_USER: gouser
       PMA_PASSWORD: password
     ports:
       - '8080:80'
     depends_on:
-      - mariadb_auth
+      - mariadb_training

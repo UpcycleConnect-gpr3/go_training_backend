@@ -1,7 +1,7 @@
 package metric_handlers
 
 import (
-	"go-upcycle_connect-backend/utils/log"
+	"go-training-backend/utils/log"
 	"net/http"
 )
 

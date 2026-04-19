@@ -2,8 +2,8 @@ package auth_middleware
 
 import (
 	"context"
-	"go-upcycle_connect-backend/utils/jwt"
-	"go-upcycle_connect-backend/utils/log"
+	"go-training-backend/utils/jwt"
+	"go-training-backend/utils/log"
 	"net/http"
 )
 

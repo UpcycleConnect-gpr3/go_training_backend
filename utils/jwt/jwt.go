@@ -5,7 +5,7 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
-	"go-upcycle_connect-backend/utils/log"
+	"go-training-backend/utils/log"
 	"net/http"
 	"os"
 

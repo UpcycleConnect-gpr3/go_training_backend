@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS TRAINING_CURRICULUM (
+    training_id INT NOT NULL,
+    curriculum_id INT NOT NULL,
+    PRIMARY KEY (training_id, curriculum_id),
+    FOREIGN KEY (training_id) REFERENCES TRAININGS(id) ON DELETE CASCADE,
+    FOREIGN KEY (curriculum_id) REFERENCES CURRICULA(id) ON DELETE CASCADE
+);

@@ -15,8 +15,10 @@
     <file url="file://$PROJECT_DIR$/database/migrations/00006_create_images_table.up.sql" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/database/migrations/00007_create_categories_table.down.sql" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/database/migrations/00007_create_categories_table.up.sql" dialect="GenericSQL" />
-    <file url="file://$PROJECT_DIR$/database/migrations/00008_create_junction_tables.down.sql" dialect="GenericSQL" />
-    <file url="file://$PROJECT_DIR$/database/migrations/00008_create_junction_tables.up.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/database/migrations/00008_create_training_curriculum_tables.down.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/database/migrations/00008_create_training_curriculum_tables.up.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/database/migrations/00009_create_training_training_content_tables.down.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/database/migrations/00009_create_training_training_content_tables.up.sql" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/database/migrations/system/migration_table.sql" dialect="GenericSQL" />
   </component>
 </project>

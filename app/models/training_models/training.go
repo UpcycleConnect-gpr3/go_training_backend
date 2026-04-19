@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"go-training-backend/database"
+	"go-training-backend/utils/db"
 	"go-training-backend/utils/log"
 	"time"
 )
@@ -23,6 +24,14 @@ type Training struct {
 	TrainerProfile              string    `db:"trainer_profile" json:"trainer_profile"`
 	CreatedAt                   time.Time `db:"created_at" json:"created_at"`
 	UpdatedAt                   time.Time `db:"updated_at" json:"updated_at"`
+}
+
+func (t *Training) Get(columns []string, by string, value any) error {
+	return db.GetQuery[Training](database.Training, TABLE, columns, by, value, t)
+}
+
+func (t *Training) All(columns []string, dest *[]Training) error {
+	return db.AllQuery[Training](database.Training, TABLE, columns, dest)
 }
 
 type CreateTrainingDTO struct {
@@ -61,66 +70,6 @@ type TrainingContentSummary struct {
 	Type string `json:"type"`
 }
 
-func scanTraining(row *sql.Row) (*Training, error) {
-	t := Training{}
-	err := row.Scan(
-		&t.Id, &t.Type, &t.Name, &t.ModeOfDelivery, &t.Duration,
-		&t.TargetAudience, &t.MinimumNumberOfParticipants,
-		&t.MaximumNumberOfParticipants, &t.Location, &t.TrainerProfile,
-		&t.CreatedAt, &t.UpdatedAt,
-	)
-	return &t, err
-}
-
-func GetAllTrainings(page, limit int) []Training {
-	action := "SELECT " + TABLE + " (paginated)"
-	offset := (page - 1) * limit
-
-	rows, err := database.Training.Query(
-		"SELECT id, type, name, mode_of_delivery, duration, target_audience, minimum_number_of_participants, maximum_number_of_participants, location, trainer_profile, created_at, updated_at FROM "+TABLE+" LIMIT ? OFFSET ?",
-		limit, offset,
-	)
-	if err != nil {
-		log.Database(action, err)
-		return []Training{}
-	}
-	defer rows.Close()
-
-	trainings := []Training{}
-	for rows.Next() {
-		var t Training
-		if err := rows.Scan(
-			&t.Id, &t.Type, &t.Name, &t.ModeOfDelivery, &t.Duration,
-			&t.TargetAudience, &t.MinimumNumberOfParticipants,
-			&t.MaximumNumberOfParticipants, &t.Location, &t.TrainerProfile,
-			&t.CreatedAt, &t.UpdatedAt,
-		); err != nil {
-			log.Database(action, err)
-			continue
-		}
-		trainings = append(trainings, t)
-	}
-	return trainings
-}
-
-func GetTrainingByID(id int) *Training {
-	action := fmt.Sprintf("SELECT "+TABLE+" WHERE id : %d", id)
-
-	row := database.Training.QueryRow(
-		"SELECT id, type, name, mode_of_delivery, duration, target_audience, minimum_number_of_participants, maximum_number_of_participants, location, trainer_profile, created_at, updated_at FROM "+TABLE+" WHERE id = ?",
-		id,
-	)
-	t, err := scanTraining(row)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil
-		}
-		log.Database(action, err)
-		return nil
-	}
-	return t
-}
-
 func CreateTraining(dto CreateTrainingDTO) *Training {
 	action := "INSERT INTO " + TABLE
 
@@ -139,7 +88,7 @@ func CreateTraining(dto CreateTrainingDTO) *Training {
 		log.Database(action, err)
 		return nil
 	}
-	return GetTrainingByID(int(id))
+	return &Training{Id: int(id)}
 }
 
 func UpdateTraining(id int, dto UpdateTrainingDTO) *Training {
@@ -155,7 +104,7 @@ func UpdateTraining(id int, dto UpdateTrainingDTO) *Training {
 		log.Database(action, err)
 		return nil
 	}
-	return GetTrainingByID(id)
+	return &Training{Id: id}
 }
 
 func DeleteTraining(id int) {

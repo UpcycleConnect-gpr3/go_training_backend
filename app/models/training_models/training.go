@@ -21,6 +21,7 @@ type Training struct {
 	Location                    string  `json:"location"`
 	TrainerProfile              string  `db:"trainer_profile" json:"trainer_profile"`
 	Price                       float64 `json:"price"`
+	Status                      string  `json:"status"`
 	CreatedAt                   string  `db:"created_at" json:"created_at"`
 	UpdatedAt                   string  `db:"updated_at" json:"updated_at"`
 }
@@ -69,6 +70,17 @@ func (t *Training) Get(columns []string, by string, value any) error {
 
 func (t *Training) All(columns []string, dest *[]Training) error {
 	return db.AllQuery[Training](database.Training, TABLE, columns, dest)
+}
+
+func SetStatus(id int, status string) error {
+	_, err := database.Training.Exec(
+		"UPDATE "+TABLE+" SET status = ?, updated_at = NOW() WHERE id = ?",
+		status, id,
+	)
+	if err != nil {
+		log.Database("SET TRAINING STATUS", err)
+	}
+	return err
 }
 
 func CreateTraining(dto CreateTrainingDTO) *Training {

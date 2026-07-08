@@ -32,7 +32,6 @@ func initialize() {
 		logger.Fatal().Err(err).Msg("Error loading .env file")
 	}
 
-	// Config Initialization
 	config.InitDatabase()
 
 	err = database.Training.Ping()
@@ -46,11 +45,8 @@ func Start() {
 
 	initialize()
 
-	//limiterLow := ratelimit_middleware.NewRateLimiter(10, 1*time.Minute)
 	limiterMedium := ratelimit_middleware.NewRateLimiter(30, 1*time.Minute)
 	limiterHigh := ratelimit_middleware.NewRateLimiter(60, 1*time.Minute)
-
-	//containerBackoffice := source_middleware.Container("go-backoffice-backend")
 
 	logger := log.NewLoggerBuilder().WithLogLevel(zerolog.DebugLevel).WithBufferSize(10000).WithRateLimit(1000).WithGroupWindow(2 * time.Second).WithOutput(zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.RFC3339}).Build()
 	defer logger.Close()
@@ -62,6 +58,8 @@ func Start() {
 	http.HandleFunc("POST /trainings/{$}", limiterMedium.RateLimit(auth_middleware.IsAuth(training_handlers.CreateTrainingHandler)))
 	http.HandleFunc("PUT /trainings/{id}/{$}", limiterMedium.RateLimit(auth_middleware.IsAuth(training_handlers.UpdateTrainingHandler)))
 	http.HandleFunc("DELETE /trainings/{id}/{$}", limiterMedium.RateLimit(auth_middleware.IsAuth(training_handlers.DeleteTrainingHandler)))
+	http.HandleFunc("POST /trainings/{id}/validate/{$}", limiterMedium.RateLimit(auth_middleware.IsAuth(training_handlers.ValidateTrainingHandler)))
+	http.HandleFunc("POST /trainings/{id}/reject/{$}", limiterMedium.RateLimit(auth_middleware.IsAuth(training_handlers.RejectTrainingHandler)))
 	http.HandleFunc("GET /trainings/{id}/curricula/{$}", limiterHigh.RateLimit(training_handlers.GetTrainingCurriculaHandler))
 	http.HandleFunc("POST /trainings/{id}/curricula/{$}", limiterMedium.RateLimit(auth_middleware.IsAuth(training_handlers.LinkTrainingCurriculumHandler)))
 	http.HandleFunc("DELETE /trainings/{id}/curricula/{curriculum_id}/{$}", limiterMedium.RateLimit(auth_middleware.IsAuth(training_handlers.UnlinkTrainingCurriculumHandler)))
@@ -70,7 +68,6 @@ func Start() {
 	http.HandleFunc("DELETE /trainings/{id}/content/{content_id}/{$}", limiterMedium.RateLimit(auth_middleware.IsAuth(training_handlers.UnlinkTrainingContentHandler)))
 	http.HandleFunc("GET /trainings/{id}/schedules/{$}", limiterHigh.RateLimit(training_handlers.GetTrainingSchedulesHandler))
 
-	// Paiement Stripe d'une formation (reserver et payer) — prix lu cote serveur.
 	http.HandleFunc("POST /trainings/{id}/checkout/{$}", limiterMedium.RateLimit(auth_middleware.IsAuth(payment_handlers.CreateTrainingCheckoutHandler)))
 	http.HandleFunc("GET /trainings/payments/session/{id}/{$}", limiterHigh.RateLimit(auth_middleware.IsAuth(payment_handlers.GetTrainingPaymentStatusHandler)))
 
@@ -111,9 +108,6 @@ func Start() {
 	}
 }
 
-// corsMiddleware enables cross-origin requests from the local dev frontends
-// (Vite on a different port). Reflects the request Origin and answers the
-// preflight OPTIONS so browser calls are not blocked.
 func corsMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if origin := r.Header.Get("Origin"); origin != "" {

@@ -6,6 +6,7 @@ import (
 	"go-training-backend/app/handlers/curricula_handlers"
 	"go-training-backend/app/handlers/image_handlers"
 	"go-training-backend/app/handlers/metric_handlers"
+	"go-training-backend/app/handlers/payment_handlers"
 	"go-training-backend/app/handlers/training_content_handlers"
 	"go-training-backend/app/handlers/training_handlers"
 	"go-training-backend/app/middleware/auth_middleware"
@@ -68,6 +69,10 @@ func Start() {
 	http.HandleFunc("POST /trainings/{id}/content/{$}", limiterMedium.RateLimit(auth_middleware.IsAuth(training_handlers.LinkTrainingContentHandler)))
 	http.HandleFunc("DELETE /trainings/{id}/content/{content_id}/{$}", limiterMedium.RateLimit(auth_middleware.IsAuth(training_handlers.UnlinkTrainingContentHandler)))
 	http.HandleFunc("GET /trainings/{id}/schedules/{$}", limiterHigh.RateLimit(training_handlers.GetTrainingSchedulesHandler))
+
+	// Paiement Stripe d'une formation (reserver et payer) — prix lu cote serveur.
+	http.HandleFunc("POST /trainings/{id}/checkout/{$}", limiterMedium.RateLimit(auth_middleware.IsAuth(payment_handlers.CreateTrainingCheckoutHandler)))
+	http.HandleFunc("GET /trainings/payments/session/{id}/{$}", limiterHigh.RateLimit(auth_middleware.IsAuth(payment_handlers.GetTrainingPaymentStatusHandler)))
 
 	http.HandleFunc("GET /curricula/{$}", limiterHigh.RateLimit(curricula_handlers.GetCurriculaHandler))
 	http.HandleFunc("GET /curricula/{id}/{$}", limiterHigh.RateLimit(curricula_handlers.GetCurriculumHandler))

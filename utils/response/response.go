@@ -90,6 +90,7 @@ const (
 	ErrImageNotFound         = "Image not found"
 	ErrTrainingNotFound      = "Training not found"
 	ErrTrainingContentNotFound = "Training content not found"
+	ErrStripe                  = "Stripe error"
 )
 
 const (

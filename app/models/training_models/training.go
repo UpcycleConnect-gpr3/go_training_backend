@@ -10,18 +10,19 @@ import (
 const TABLE = "TRAININGS"
 
 type Training struct {
-	Id                          int    `json:"id"`
-	Type                        string `json:"type"`
-	Name                        string `json:"name"`
-	ModeOfDelivery              string `db:"mode_of_delivery" json:"mode_of_delivery"`
-	Duration                    string `json:"duration"`
-	TargetAudience              string `db:"target_audience" json:"target_audience"`
-	MinimumNumberOfParticipants int    `db:"minimum_number_of_participants" json:"minimum_number_of_participants"`
-	MaximumNumberOfParticipants int    `db:"maximum_number_of_participants" json:"maximum_number_of_participants"`
-	Location                    string `json:"location"`
-	TrainerProfile              string `db:"trainer_profile" json:"trainer_profile"`
-	CreatedAt                   string `db:"created_at" json:"created_at"`
-	UpdatedAt                   string `db:"updated_at" json:"updated_at"`
+	Id                          int     `json:"id"`
+	Type                        string  `json:"type"`
+	Name                        string  `json:"name"`
+	ModeOfDelivery              string  `db:"mode_of_delivery" json:"mode_of_delivery"`
+	Duration                    string  `json:"duration"`
+	TargetAudience              string  `db:"target_audience" json:"target_audience"`
+	MinimumNumberOfParticipants int     `db:"minimum_number_of_participants" json:"minimum_number_of_participants"`
+	MaximumNumberOfParticipants int     `db:"maximum_number_of_participants" json:"maximum_number_of_participants"`
+	Location                    string  `json:"location"`
+	TrainerProfile              string  `db:"trainer_profile" json:"trainer_profile"`
+	Price                       float64 `json:"price"`
+	CreatedAt                   string  `db:"created_at" json:"created_at"`
+	UpdatedAt                   string  `db:"updated_at" json:"updated_at"`
 }
 
 type CreateTrainingDTO struct {
@@ -34,6 +35,7 @@ type CreateTrainingDTO struct {
 	MaximumNumberOfParticipants int
 	Location                    string
 	TrainerProfile              string
+	Price                       float64
 }
 
 type UpdateTrainingDTO struct {
@@ -46,6 +48,7 @@ type UpdateTrainingDTO struct {
 	MaximumNumberOfParticipants int
 	Location                    string
 	TrainerProfile              string
+	Price                       float64
 }
 
 type CurriculaSummary struct {
@@ -72,10 +75,10 @@ func CreateTraining(dto CreateTrainingDTO) *Training {
 	action := "INSERT INTO " + TABLE
 
 	result, err := database.Training.Exec(
-		"INSERT INTO "+TABLE+" (type, name, mode_of_delivery, duration, target_audience, minimum_number_of_participants, maximum_number_of_participants, location, trainer_profile) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+		"INSERT INTO "+TABLE+" (type, name, mode_of_delivery, duration, target_audience, minimum_number_of_participants, maximum_number_of_participants, location, trainer_profile, price) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
 		dto.Type, dto.Name, dto.ModeOfDelivery, dto.Duration, dto.TargetAudience,
 		dto.MinimumNumberOfParticipants, dto.MaximumNumberOfParticipants,
-		dto.Location, dto.TrainerProfile,
+		dto.Location, dto.TrainerProfile, dto.Price,
 	)
 	if err != nil {
 		log.Database(action, err)
@@ -93,10 +96,10 @@ func UpdateTraining(id int, dto UpdateTrainingDTO) *Training {
 	action := fmt.Sprintf("UPDATE "+TABLE+" WHERE id : %d", id)
 
 	_, err := database.Training.Exec(
-		"UPDATE "+TABLE+" SET type = ?, name = ?, mode_of_delivery = ?, duration = ?, target_audience = ?, minimum_number_of_participants = ?, maximum_number_of_participants = ?, location = ?, trainer_profile = ? WHERE id = ?",
+		"UPDATE "+TABLE+" SET type = ?, name = ?, mode_of_delivery = ?, duration = ?, target_audience = ?, minimum_number_of_participants = ?, maximum_number_of_participants = ?, location = ?, trainer_profile = ?, price = ? WHERE id = ?",
 		dto.Type, dto.Name, dto.ModeOfDelivery, dto.Duration, dto.TargetAudience,
 		dto.MinimumNumberOfParticipants, dto.MaximumNumberOfParticipants,
-		dto.Location, dto.TrainerProfile, id,
+		dto.Location, dto.TrainerProfile, dto.Price, id,
 	)
 	if err != nil {
 		log.Database(action, err)

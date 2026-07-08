@@ -72,8 +72,6 @@ func (t *Training) All(columns []string, dest *[]Training) error {
 	return db.AllQuery[Training](database.Training, TABLE, columns, dest)
 }
 
-// SetStatus met a jour le statut de validation d'une formation
-// (pending / validated / rejected).
 func SetStatus(id int, status string) error {
 	_, err := database.Training.Exec(
 		"UPDATE "+TABLE+" SET status = ?, updated_at = NOW() WHERE id = ?",

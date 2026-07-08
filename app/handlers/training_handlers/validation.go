@@ -10,7 +10,6 @@ import (
 	"go-training-backend/utils/response"
 )
 
-// isResponsable : seul un responsable (administrator) peut valider/refuser.
 func isResponsable(r *http.Request) bool {
 	return jwt.RoleFromToken(r.Header.Get("Authorization")) == "administrator"
 }
@@ -42,12 +41,10 @@ func setTrainingStatus(w http.ResponseWriter, r *http.Request, status string) {
 	response.NewSuccessData(w, map[string]any{"id": id, "status": status})
 }
 
-// ValidateTrainingHandler — POST /trainings/{id}/validate (responsable)
 func ValidateTrainingHandler(w http.ResponseWriter, r *http.Request) {
 	setTrainingStatus(w, r, "validated")
 }
 
-// RejectTrainingHandler — POST /trainings/{id}/reject (responsable)
 func RejectTrainingHandler(w http.ResponseWriter, r *http.Request) {
 	setTrainingStatus(w, r, "rejected")
 }

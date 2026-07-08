@@ -19,10 +19,6 @@ type createCheckoutDTO struct {
 	CancelURL  string `json:"cancel_url"`
 }
 
-// CreateTrainingCheckoutHandler — POST /trainings/{id}/checkout (auth required)
-// Creates a one-time Stripe Checkout Session to reserve and pay a training.
-// The amount is derived from the training price server side — the client never
-// sends a price.
 func CreateTrainingCheckoutHandler(w http.ResponseWriter, r *http.Request) {
 	log.Api(r)
 
@@ -49,13 +45,11 @@ func CreateTrainingCheckoutHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// On ne peut reserver qu'une formation validee par un responsable.
 	if training.Status != "validated" {
 		response.NewErrorMessage(w, response.ErrForbidden, http.StatusForbidden)
 		return
 	}
 
-	// A free training has nothing to pay.
 	if training.Price <= 0 {
 		response.NewErrorMessage(w, response.ErrInvalidBody, http.StatusBadRequest)
 		return
@@ -91,8 +85,6 @@ func CreateTrainingCheckoutHandler(w http.ResponseWriter, r *http.Request) {
 	response.NewSuccessData(w, map[string]string{"url": session.URL})
 }
 
-// GetTrainingPaymentStatusHandler — GET /trainings/payments/session/{id} (auth)
-// Reads the session from Stripe, reflects the result in DB, returns the status.
 func GetTrainingPaymentStatusHandler(w http.ResponseWriter, r *http.Request) {
 	log.Api(r)
 
@@ -115,7 +107,7 @@ func GetTrainingPaymentStatusHandler(w http.ResponseWriter, r *http.Request) {
 		status = "paid"
 		trainingId := 0
 		if _, ok := session.Metadata["training_id"]; ok {
-			// best-effort parse; ignore error, reservation already exists
+
 			for _, c := range session.Metadata["training_id"] {
 				if c < '0' || c > '9' {
 					trainingId = 0

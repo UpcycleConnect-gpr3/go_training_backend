@@ -44,8 +44,14 @@ func CreateTrainingCheckoutHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var training training_models.Training
-	if err := training.Get([]string{"id", "name", "price"}, "id = ?", id); err != nil {
+	if err := training.Get([]string{"id", "name", "price", "status"}, "id = ?", id); err != nil {
 		response.NewErrorMessage(w, response.ErrTrainingNotFound, http.StatusNotFound)
+		return
+	}
+
+	// On ne peut reserver qu'une formation validee par un responsable.
+	if training.Status != "validated" {
+		response.NewErrorMessage(w, response.ErrForbidden, http.StatusForbidden)
 		return
 	}
 

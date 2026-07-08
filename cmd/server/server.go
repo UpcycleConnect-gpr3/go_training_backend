@@ -62,6 +62,8 @@ func Start() {
 	http.HandleFunc("POST /trainings/{$}", limiterMedium.RateLimit(auth_middleware.IsAuth(training_handlers.CreateTrainingHandler)))
 	http.HandleFunc("PUT /trainings/{id}/{$}", limiterMedium.RateLimit(auth_middleware.IsAuth(training_handlers.UpdateTrainingHandler)))
 	http.HandleFunc("DELETE /trainings/{id}/{$}", limiterMedium.RateLimit(auth_middleware.IsAuth(training_handlers.DeleteTrainingHandler)))
+	http.HandleFunc("POST /trainings/{id}/validate/{$}", limiterMedium.RateLimit(auth_middleware.IsAuth(training_handlers.ValidateTrainingHandler)))
+	http.HandleFunc("POST /trainings/{id}/reject/{$}", limiterMedium.RateLimit(auth_middleware.IsAuth(training_handlers.RejectTrainingHandler)))
 	http.HandleFunc("GET /trainings/{id}/curricula/{$}", limiterHigh.RateLimit(training_handlers.GetTrainingCurriculaHandler))
 	http.HandleFunc("POST /trainings/{id}/curricula/{$}", limiterMedium.RateLimit(auth_middleware.IsAuth(training_handlers.LinkTrainingCurriculumHandler)))
 	http.HandleFunc("DELETE /trainings/{id}/curricula/{curriculum_id}/{$}", limiterMedium.RateLimit(auth_middleware.IsAuth(training_handlers.UnlinkTrainingCurriculumHandler)))

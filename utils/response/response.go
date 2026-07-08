@@ -91,6 +91,7 @@ const (
 	ErrTrainingNotFound      = "Training not found"
 	ErrTrainingContentNotFound = "Training content not found"
 	ErrStripe                  = "Stripe error"
+	ErrForbidden               = "Forbidden"
 )
 
 const (

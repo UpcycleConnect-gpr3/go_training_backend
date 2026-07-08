@@ -17,7 +17,7 @@ func GetTrainingsHandler(w http.ResponseWriter, r *http.Request) {
 	var training training_models.Training
 	var trainings []training_models.Training
 
-	columns := []string{"id", "type", "name", "mode_of_delivery", "duration", "target_audience", "minimum_number_of_participants", "maximum_number_of_participants", "location", "trainer_profile", "price", "created_at", "updated_at"}
+	columns := []string{"id", "type", "name", "mode_of_delivery", "duration", "target_audience", "minimum_number_of_participants", "maximum_number_of_participants", "location", "trainer_profile", "price", "status", "created_at", "updated_at"}
 
 	err := training.All(columns, &trainings)
 	if err != nil {
@@ -36,7 +36,7 @@ func GetTrainingHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var training training_models.Training
-	columns := []string{"id", "type", "name", "mode_of_delivery", "duration", "target_audience", "minimum_number_of_participants", "maximum_number_of_participants", "location", "trainer_profile", "price", "created_at", "updated_at"}
+	columns := []string{"id", "type", "name", "mode_of_delivery", "duration", "target_audience", "minimum_number_of_participants", "maximum_number_of_participants", "location", "trainer_profile", "price", "status", "created_at", "updated_at"}
 	err := training.Get(columns, "id = ?", id)
 	if err != nil {
 		response.NewErrorMessage(w, response.ErrTrainingNotFound, http.StatusNotFound)
